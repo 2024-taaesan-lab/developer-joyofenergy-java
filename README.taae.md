@@ -5,6 +5,12 @@ After open the project folder with Intelij, there is compiling error on the foll
 ![e1](./resources/e1.png)
 
 
+## Jenkins
+http://localhost:8888/job/dev_developer-joyofenergy-java/
+
+## Docker
+./gradlew jar
+docker-compose up --build api
 
 
 

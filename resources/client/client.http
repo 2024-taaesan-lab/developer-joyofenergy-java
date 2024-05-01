@@ -1,0 +1,36 @@
+### Store the reading meter with smartMeterId
+POST http://localhost:8282/readings/store
+Content-Type: application/json
+
+{
+    "smartMeterId": "taae",
+    "electricityReadings": [
+        {
+            "time": "2024-05-01T04:08:16.687078474Z",
+            "reading": 1.1678
+        },
+        {
+            "time": "2024-05-01T04:08:26.687078474Z",
+            "reading": 1.2489
+        },
+        {
+            "time": "2024-05-01T04:08:36.687078474Z",
+            "reading": 0.1613
+        }
+    ]
+}
+
+
+### Read by smartMeterId
+GET http://localhost:8282/readings/read/taae
+Content-Type: application/json
+
+
+### Read by smartMeterId
+GET http://localhost:8282/price-plans/compare-all/taae
+Content-Type: application/json
+
+
+### Get recommened price plan
+GET http://localhost:8282/price-plans/recommend/taae?limit=3
+Content-Type: application/json

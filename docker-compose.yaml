@@ -1,0 +1,13 @@
+networks:
+  app-tier:
+    driver: bridge
+services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    container_name: tw-api
+    ports:
+      - 8282:8080
+    networks:
+      - app-tier
