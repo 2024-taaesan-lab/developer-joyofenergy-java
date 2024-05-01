@@ -1,0 +1,94 @@
+classDiagram
+class PricePlanComparatorController {
+    - final static String PRICE_PLAN_ID_KEY
+    - final static String PRICE_PLAN_COMPARISONS_KEY
+    - PricePlanService pricePlanService
+    - AccountService accountService
+
+    + PricePlanComparatorController(PricePlanService pricePlanService, AccountService accountService)
+    + ResponseEntity<Map<String, Object>> calculatedCostForEachPricePlan(String smartMeterId)
+    + ResponseEntity<List<Map.Entry<String, BigDecimal>>> recommendCheapestPricePlans(String smartMeterId, Integer limit)
+}
+
+PricePlanComparatorController *-- PricePlanService : uses
+PricePlanComparatorController *-- AccountService : uses
+
+class MeterReadingController {
+    - MeterReadingService meterReadingService
+
+    + MeterReadingController(MeterReadingService meterReadingService)
+    + ResponseEntity storeReadings(MeterReadings meterReadings)
+    - boolean isMeterReadingsValid(MeterReadings meterReadings)
+    + ResponseEntity readReadings(String smartMeterId)
+}
+
+class MeterReadings {
+    - String smartMeterId
+    - List<ElectricityReading> electricityReadings
+    + String smartMeterId()
+    + List<ElectricityReading> electricityReadings()
+}
+
+class ElectricityReading {
+    - int reading
+    - String time
+    + int reading()
+    + String time()
+}
+
+MeterReadingController *-- MeterReadingService : uses
+
+
+class AccountService {
+    - Map<String, String> smartMeterToPricePlanAccounts
+
+    + AccountService(Map<String, String> smartMeterToPricePlanAccounts)
+    + String getPricePlanIdForSmartMeterId(String smartMeterId)
+}
+
+AccountService -- Map : has
+
+class PricePlanService {
+    - List<PricePlan> pricePlans
+    - MeterReadingService meterReadingService
+
+    + PricePlanService(List<PricePlan> pricePlans, MeterReadingService meterReadingService)
+    + Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(String smartMeterId)
+    - BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
+    - BigDecimal calculateAverageReading(List<ElectricityReading> electricityReadings)
+    - BigDecimal calculateTimeElapsed(List<ElectricityReading> electricityReadings)
+}
+
+PricePlanService *-- PricePlan : has
+PricePlanService *-- MeterReadingService : uses
+
+class MeterReadingService {
+    - Map<String, List<ElectricityReading>> meterAssociatedReadings
+
+    + MeterReadingService(Map<String, List<ElectricityReading>> meterAssociatedReadings)
+    + Optional<List<ElectricityReading>> getReadings(String smartMeterId)
+    + void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings)
+}
+
+MeterReadingService -- Map : has
+
+class PricePlan {
+    - String energySupplier
+    - String planName
+    - BigDecimal unitRate
+    - List<PeakTimeMultiplier> peakTimeMultipliers
+
+    + PricePlan(String planName, String energySupplier, BigDecimal unitRate, List<PeakTimeMultiplier> peakTimeMultipliers)
+    + String getEnergySupplier()
+    + String getPlanName()
+    + BigDecimal getUnitRate()
+    + BigDecimal getPrice(LocalDateTime dateTime)
+}
+
+
+class PeakTimeMultiplier {
+    - DayOfWeek dayOfWeek
+    - BigDecimal multiplier
+
+    + PeakTimeMultiplier(DayOfWeek dayOfWeek, BigDecimal multiplier)
+}
