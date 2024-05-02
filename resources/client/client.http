@@ -9,23 +9,32 @@ Content-Type: application/json
     "smartMeterId": "taae",
     "electricityReadings": [
         {
-            "time": "2024-05-01T04:08:16.687078474Z",
-            "reading": 1.1678
+            "time": "2024-04-28T04:08:16.687078474Z",
+            "reading": 200
         },
         {
-            "time": "2024-05-01T04:08:26.687078474Z",
-            "reading": 1.2489
+            "time": "2024-04-29T04:08:36.687078474Z",
+            "reading": 100
         },
         {
-            "time": "2024-05-01T04:08:36.687078474Z",
-            "reading": 0.1613
+            "time": "2024-04-30T04:08:36.687078474Z",
+            "reading": 100
         }
     ]
 }
 
 
+### Store the reading meter with smartMeterId
+POST http://{{host}}/price-plans/power-user-cost
+Content-Type: application/json
+
+{
+    "day": 7,
+    "smartMeterId": "taae"
+}
+
 ### Read by smartMeterId
-GET http://{{host}}/readings/read/taae
+GET http://{{host}}/readings/read/taae?day=7
 Content-Type: application/json
 
 

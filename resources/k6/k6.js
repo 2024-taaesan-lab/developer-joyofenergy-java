@@ -41,7 +41,7 @@ export default function () {
   };
   //console.log('Random user: ', JSON.stringify(params));
 
-  const res = http.post('http://localhost:8282/api/says', JSON.stringify(payload), params);
+  const res = http.get('http://localhost:8080/readings/read/taae', JSON.stringify(payload), params);
   check(res, {
     'login succeeded': (r) => r.status === 200,
   });

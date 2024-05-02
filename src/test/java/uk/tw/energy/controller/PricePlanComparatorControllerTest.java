@@ -3,11 +3,14 @@ package uk.tw.energy.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.PricePlan;
+import uk.tw.energy.dto.PowerUsageRequest;
 import uk.tw.energy.service.AccountService;
 import uk.tw.energy.service.MeterReadingService;
 import uk.tw.energy.service.PricePlanService;
+import uk.tw.energy.strategy.DefaultCostCalculationStrategy;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -38,7 +41,8 @@ public class PricePlanComparatorControllerTest {
         PricePlan pricePlan3 = new PricePlan(PRICE_PLAN_3_ID, null, BigDecimal.valueOf(2), null);
 
         List<PricePlan> pricePlans = Arrays.asList(pricePlan1, pricePlan2, pricePlan3);
-        PricePlanService tariffService = new PricePlanService(pricePlans, meterReadingService);
+        DefaultCostCalculationStrategy defaultStrategy = new DefaultCostCalculationStrategy();
+        PricePlanService tariffService = new PricePlanService(pricePlans, meterReadingService, defaultStrategy);
 
         Map<String, String> meterToTariffs = new HashMap<>();
         meterToTariffs.put(SMART_METER_ID, PRICE_PLAN_1_ID);
@@ -113,5 +117,29 @@ public class PricePlanComparatorControllerTest {
     @Test
     public void givenNoMatchingMeterIdShouldReturnNotFound() {
         assertThat(controller.calculatedCostForEachPricePlan("not-found").getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void invalidParameterOnPowerUsageCost(){
+        assertThat(controller.powerUsageCost(new PowerUsageRequest()).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void calculateOnPowerUsageCost(){
+
+        ElectricityReading electricityReading = new ElectricityReading(Instant.now().minusSeconds(3600), BigDecimal.valueOf(15.0));
+        ElectricityReading otherReading = new ElectricityReading(Instant.now(), BigDecimal.valueOf(5.0));
+        meterReadingService.storeReadings(SMART_METER_ID, Arrays.asList(electricityReading, otherReading));
+
+        Map<String, BigDecimal> expectedPricePlanToCost = new HashMap<>();
+        expectedPricePlanToCost.put(PRICE_PLAN_1_ID, BigDecimal.valueOf(100.0));
+        expectedPricePlanToCost.put(PRICE_PLAN_2_ID, BigDecimal.valueOf(10.0));
+        expectedPricePlanToCost.put(PRICE_PLAN_3_ID, BigDecimal.valueOf(20.0));
+
+
+        PowerUsageRequest powerUsageRequest = new PowerUsageRequest();
+        powerUsageRequest.setDay(7);
+        powerUsageRequest.setSmartMeterId("smart-meter-id");
+        controller.powerUsageCost(powerUsageRequest);
     }
 }
