@@ -1,0 +1,56 @@
+classDiagram
+    class PricePlanService {
+        - List<PricePlan> pricePlans
+        - MeterReadingService meterReadingService
+        - CostCalculationStrategy costCalculationStrategy
+        + PricePlanService(List<PricePlan> pricePlans, MeterReadingService meterReadingService, CostCalculationStrategy costCalculationStrategy)
+        + Optional<Map<String, BigDecimal>> getConsumptionCostOfElectricityReadingsForEachPricePlan(String smartMeterId)
+        - BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
+    }
+    class MeterReadingService {
+        - Map<String, List<ElectricityReading>> meterAssociatedReadings
+        + MeterReadingService(Map<String, List<ElectricityReading>> meterAssociatedReadings)
+        + Optional<List<ElectricityReading>> getReadings(String smartMeterId)
+        + void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings)
+    }
+    class CostCalculationStrategy {
+        + BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
+    }
+    class AverageReadingCostCalculationStrategy {
+        + BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
+    }
+    class TimeElapsedCostCalculationStrategy {
+        + BigDecimal calculateCost(List<ElectricityReading> electricityReadings, PricePlan pricePlan)
+    }
+    class PricePlan {
+        - String energySupplier
+        - String planName
+        - BigDecimal unitRate
+        - List<PeakTimeMultiplier> peakTimeMultipliers
+        + PricePlan(String planName, String energySupplier, BigDecimal unitRate, List<PeakTimeMultiplier> peakTimeMultipliers)
+        + String getEnergySupplier()
+        + String getPlanName()
+        + BigDecimal getUnitRate()
+        + BigDecimal getPrice(LocalDateTime dateTime)
+    }
+    class ElectricityReading {
+        - int reading
+        - String time
+        + int reading()
+        + String time()
+    }
+    class PeakTimeMultiplier {
+        - DayOfWeek dayOfWeek
+        - BigDecimal multiplier
+        + PeakTimeMultiplier(DayOfWeek dayOfWeek, BigDecimal multiplier)
+    }
+
+PricePlanService *-- MeterReadingService : uses
+PricePlanService *-- CostCalculationStrategy : uses
+PricePlanService *-- PricePlan : has
+
+PricePlanService *-- AverageReadingCostCalculationStrategy : has
+PricePlanService *-- TimeElapsedCostCalculationStrategy : has
+
+CostCalculationStrategy <|.. AverageReadingCostCalculationStrategy
+CostCalculationStrategy <|.. TimeElapsedCostCalculationStrategy
