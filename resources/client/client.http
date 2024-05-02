@@ -1,5 +1,8 @@
+@host = localhost:8080
+
+
 ### Store the reading meter with smartMeterId
-POST http://localhost:8282/readings/store
+POST http://{{host}}/readings/store
 Content-Type: application/json
 
 {
@@ -22,15 +25,15 @@ Content-Type: application/json
 
 
 ### Read by smartMeterId
-GET http://localhost:8282/readings/read/taae
+GET http://{{host}}/readings/read/taae
 Content-Type: application/json
 
 
-### Read by smartMeterId
-GET http://localhost:8282/price-plans/compare-all/taae
+### Compare ALL 
+GET http://{{host}}/price-plans/compare-all/taae
 Content-Type: application/json
 
 
-### Get recommened price plan
-GET http://localhost:8282/price-plans/recommend/taae?limit=3
+### Recommend
+GET http://{{host}}/price-plans/recommend/taae?limit=3
 Content-Type: application/json
